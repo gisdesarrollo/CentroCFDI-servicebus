@@ -1,6 +1,7 @@
 package com.gisconsultoria.com.apiBox.utils;
 
 import com.gisconsultoria.com.apiBox.model.dao.ComplementoDao;
+import com.gisconsultoria.com.apiBox.model.dto.Comprobante40XmlDto;
 import com.gisconsultoria.com.apiBox.model.dto.ComprobanteXmlDto;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,9 +97,9 @@ public class ApBoxReadXmlFile implements IApBoxReadXmlFile{
 
         if(version == 3.2){
             throw new IOException("Versión incorrecta del comprobante");
-        }else if(version == 3.3){
+        }else if(version == 3.3 || version == 4.0){
             try {
-                unmarshallXmlToComprobanteXml(file, xml);
+                unmarshallXmlToComprobanteXml(file, xml, version);
             }catch(JAXBException jaxbException){
                 LOG.error("Error al momento de deserializar el xml", jaxbException);
                 jaxbException.printStackTrace();
@@ -108,25 +109,41 @@ public class ApBoxReadXmlFile implements IApBoxReadXmlFile{
     }
 
     @Override
-    public void unmarshallXmlToComprobanteXml(File file, String xml) throws Exception {
+    public void unmarshallXmlToComprobanteXml(File file, String xml, Double version) throws Exception {
 
         LOG.info("DESERIALIZACIÓN DEL OBJETO");
-
-        JAXBContext jaxbContext = JAXBContext.newInstance(ComprobanteXmlDto.class,
-                ComplementoDao.class);
-
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        ComprobanteXmlDto comprobante = (ComprobanteXmlDto)unmarshaller.unmarshal(
-                new File(file.getAbsolutePath() + "/" + xml));
-
-        LOG.info("XML DESERELIAZIDO");
+        JAXBContext jaxbContext;
+        ComprobanteXmlDto comprobante33;
+        Comprobante40XmlDto comprobante40;
+        
+		if (version == 3.3) {
+			LOG.info("XML version 3.3");
+			jaxbContext = JAXBContext.newInstance(ComprobanteXmlDto.class, ComplementoDao.class);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			comprobante33 = (ComprobanteXmlDto) unmarshaller.unmarshal(new File(file.getAbsolutePath() + "/" + xml));
+			comprobante40 = null;
+			
+		} else {
+			LOG.info("XML version 4.0");
+			jaxbContext = JAXBContext.newInstance(Comprobante40XmlDto.class, ComplementoDao.class);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			comprobante40 = (Comprobante40XmlDto) unmarshaller.unmarshal(new File(file.getAbsolutePath() + "/" + xml));
+			comprobante33 = null;
+			
+		}
+        LOG.info("XML DESEREALIZADO");
 
         DOMResult res = new DOMResult();
-
+        
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(comprobante, res);
-
+        if(comprobante33 != null && comprobante40 == null) {
+        	marshaller.marshal(comprobante33, res);
+        }
+        if(comprobante33 == null && comprobante40 !=null) {
+        	marshaller.marshal(comprobante40, res);	
+        }
+        
         Document doc = (Document)res.getNode();
         NodeList nodeList = doc.getElementsByTagName("tfd:TimbreFiscalDigital");
         String fechaTimbrado = "";
@@ -146,13 +163,16 @@ public class ApBoxReadXmlFile implements IApBoxReadXmlFile{
             LOG.error("Documento sin timbre fiscal");
             throw new Exception("Documento sin timbre fiscal");
         }
-
-        if(logicaFacade.checarUuidRepetidoBD(fechaTimbrado, uuid, file, xml)){
-            if(logicaFacade.checarRfcReceptor(comprobante)){
-                LOG.info("GUARDANDO ARCHIVO: ".concat(xml).concat( "EN LA BD"));
-                logicaFacade.guardarComprobanteBD(comprobante, file, xml, uuid);
-            }
-        }
-
+        
+        	if(logicaFacade.checarUuidRepetidoBD(fechaTimbrado, uuid, file, xml)){
+            	if(logicaFacade.checarRfcReceptor(comprobante33, comprobante40)){
+                	LOG.info("GUARDANDO ARCHIVO: ".concat(xml).concat( "EN LA BD"));
+                	if(version == 3.3) {
+                	logicaFacade.guardarComprobanteBD33(comprobante33, file, xml, uuid);
+                	}else {
+                		logicaFacade.guardarComprobanteBD40(comprobante40, file, xml, uuid);
+                	}
+            	}
+        	}
     }
 }

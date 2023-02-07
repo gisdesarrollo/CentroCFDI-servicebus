@@ -38,7 +38,12 @@ public class ApBoxXsaService {
 
 		Sucursal sucursal = sucursalService.findById(sucursalId);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String fechaInicial = dateFormat.format(fecha);
+		Calendar cFechaInicial = Calendar.getInstance();
+        cFechaInicial.setTime(fecha);
+      ///se cambia a menos dos meses para descargar las facturas faltantes
+      //cFechaInicial.add(Calendar.MONTH, -2);
+        cFechaInicial.add(Calendar.DAY_OF_MONTH, -1);
+		String fechaInicial = dateFormat.format(cFechaInicial.getTime());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(fecha);
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -52,6 +57,7 @@ public class ApBoxXsaService {
 			totalCfdiEmitidos = descargaCfdi.getTotalCfdiGenerados(sucursal.getServidor(), sucursal.getKeyXsa(),
 					fechaInicial, fechaFinal);
 			if(totalCfdiEmitidos==0) {
+				LOG.info("No se encontraron cfdi emitidos de la sucursal: "+sucursal.getNombre()+" con fecha: "+fechaInicial);
 				throw new Exception("No se encontraron cfdi emitidos de la sucursal: "+sucursal.getNombre()+" con fecha: "+fechaInicial);
 			}
 			// totalPageNumber
@@ -76,7 +82,7 @@ public class ApBoxXsaService {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("Error al momento de ejecucion");
+			//LOG.error("Error al momento de ejecucion");
 		}
 		sucursal.setFechaInicial(calendar.getTime());
 		sucursalService.save(sucursal);
@@ -94,7 +100,7 @@ public class ApBoxXsaService {
 		for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
 			ZipEntry entry = (ZipEntry) entries.nextElement();
 
-			if (entry.getName().contains(".xml") || entry.getName().toUpperCase().contains(".xml")) {
+			if (entry.getName().contains(".xml") || entry.getName().contains(".XML")) {
 				LOG.info("Obteniendo el archivo: " + entry.getName());
 				File file = new File(path, File.separator + entry.getName());
 				if (!buildDirectory(file.getParentFile())) {

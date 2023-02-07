@@ -1,6 +1,7 @@
 package com.gisconsultoria.com.apiBox.model.dao;
 
 import com.gisconsultoria.com.apiBox.model.enums.PaisEnum;
+import com.gisconsultoria.com.apiBox.model.enums.RegimenFiscalEnum;
 import com.gisconsultoria.com.apiBox.model.enums.UsoCfdiEnum;
 
 import javax.xml.bind.annotation.*;
@@ -19,6 +20,14 @@ public class ReceptorDao {
 
     @XmlAttribute(name = "ResidenciaFiscal")
     private PaisEnum residenciaFiscal;
+    
+    //version 4.0
+    @XmlAttribute(name = "RegimenFiscalReceptor")
+    private String regimenFiscal;
+    
+    //version 4.0
+    @XmlAttribute(name = "DomicilioFiscalReceptor")
+    private String domicilioFiscal;
 
     @XmlTransient
     private boolean ResidenciaFiscalSpecified;
@@ -76,4 +85,23 @@ public class ReceptorDao {
     public void setUsoCfdi(UsoCfdiEnum usoCfdi) {
         this.usoCfdi = usoCfdi;
     }
+
+	public String getRegimenFiscal() {
+		return regimenFiscal;
+	}
+
+	public void setRegimenFiscal(String regimenFiscal) {
+		this.regimenFiscal = regimenFiscal;
+	}
+
+	public String getDomicilioFiscal() {
+		return domicilioFiscal;
+	}
+
+	public void setDomicilioFiscal(String domicilioFiscal) {
+		this.domicilioFiscal = domicilioFiscal;
+	}
+
+
+    
 }

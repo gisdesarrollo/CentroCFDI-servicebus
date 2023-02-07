@@ -23,6 +23,8 @@ public enum RegimenFiscalEnum {
     ActividadesAgricolasGanaderasSilvicolasYPesqueras 					(622),
     OpcionalParaGruposDeSociedades 										(623),
     Coordinados 														(624),
+    RégimenDeLasActividadesEmpresarialesConIngresosATravésDePlataformasTecnológicas (625),
+    RégimenSimplificadoDeConfianza                                      (626),
     Hidrocarburos 														(628),
     DeLosRegimenesFiscalesPreferentesYDeLasEmpresasMultinacionales 		(629),
     EnajenacionDeAccionesEnBolsaDeValores 								(630);

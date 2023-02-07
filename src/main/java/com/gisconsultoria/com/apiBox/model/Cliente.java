@@ -1,6 +1,9 @@
 package com.gisconsultoria.com.apiBox.model;
 
 import javax.persistence.*;
+
+import com.gisconsultoria.com.apiBox.model.enums.RegimenFiscalEnum;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -47,6 +50,9 @@ public class Cliente implements Serializable {
 
     @Column(name = "CodigoPostal")
     private String codigoPostal;
+    
+    @Column(name = "RegimenFiscal")
+    private int regimenFiscal;
 
     @Column(name = "Pais")
     private int pais;
@@ -57,13 +63,26 @@ public class Cliente implements Serializable {
 
     public Cliente(){}
 
-    public Cliente(Date fechaAlta, int status, String razonSocial, String rfc, int pais, Sucursal sucursal) {
+    public Cliente(Date fechaAlta, int status, String razonSocial, String rfc, int pais, Sucursal sucursal,int regimenFiscal,String codigoPostal) {
         this.fechaAlta = fechaAlta;
         this.status = status;
         this.razonSocial = razonSocial;
         this.rfc = rfc;
         this.pais = pais;
         this.sucursal = sucursal;
+        this.regimenFiscal = regimenFiscal;
+        this.codigoPostal = codigoPostal;
+        
+    }
+    public Cliente(Date fechaAlta, int status, String razonSocial, String rfc, int pais, Sucursal sucursal,String codigoPostal) {
+        this.fechaAlta = fechaAlta;
+        this.status = status;
+        this.razonSocial = razonSocial;
+        this.rfc = rfc;
+        this.pais = pais;
+        this.sucursal = sucursal;
+        this.codigoPostal = codigoPostal;
+        
     }
 
     public Long getId() {
@@ -161,4 +180,13 @@ public class Cliente implements Serializable {
     public void setSucursal(Sucursal sucursal) {
         this.sucursal = sucursal;
     }
+
+	public int getRegimenFiscal() {
+		return regimenFiscal;
+	}
+
+	public void setRegimenFiscal(int regimenFiscal) {
+		this.regimenFiscal = regimenFiscal;
+	}
+    
 }
