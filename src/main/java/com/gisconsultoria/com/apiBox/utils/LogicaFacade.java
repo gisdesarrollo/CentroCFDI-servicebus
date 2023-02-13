@@ -26,6 +26,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 /**
  * @author Luis Enrique Morales Soriano
  */
@@ -61,6 +63,8 @@ public class LogicaFacade implements ILogicaFacade {
         List<FacturaEmitida> facturas =
                 facturaEmitidaService.findFirstFacturaEmitidaByUuid(uuid);
 
+        
+        //Validacion de una factura que ya fue  cargada a la Bd
         if (facturas != null) {
             for (FacturaEmitida factura : facturas) {
                 if (factura != null) {
@@ -78,6 +82,7 @@ public class LogicaFacade implements ILogicaFacade {
 
     @Override
     public boolean checarRfcReceptor(ComprobanteXmlDto comprobante33,Comprobante40XmlDto comprobante40) throws Exception {
+    	Long Id= null;
     	String RFCEmisor= null; 
     	String RFCReceptor = null;
     	String NombreReceptor = null ;
@@ -85,11 +90,13 @@ public class LogicaFacade implements ILogicaFacade {
     	String RegimenFiscalReceptor = null ;
     	
     	if(comprobante33 != null && comprobante40 == null) {
+    	 
     		RFCEmisor = comprobante33.getEmisor().getRfc();
     		RFCReceptor = comprobante33.getReceptor().getRfc();
     		NombreReceptor = comprobante33.getReceptor().getNombre();
     	}
     	if(comprobante33 == null && comprobante40 != null) {
+     
     		RFCEmisor = comprobante40.getEmisor().getRfc();
     		RFCReceptor = comprobante40.getReceptor().getRfc();
     		NombreReceptor = comprobante40.getReceptor().getNombre();
@@ -97,6 +104,8 @@ public class LogicaFacade implements ILogicaFacade {
     		RegimenFiscalReceptor = comprobante40.getReceptor().getRegimenFiscal();
     	}
         Sucursal sucursal = sucursalService.getSucursalByRfc(RFCEmisor);
+       
+        
 
         if (sucursal == null) {
             throw new Exception("El RFC del emisor: ".concat(RFCEmisor)
@@ -111,7 +120,9 @@ public class LogicaFacade implements ILogicaFacade {
                     NombreReceptor, sucursal.getId());
         } else {
             clientes = clienteService.getListClienteByParams(RFCReceptor
-                    , sucursal.getId());
+                    , sucursal.getId()); 
+            
+            
         }
 
         if (clientes.isEmpty()) {
@@ -122,6 +133,8 @@ public class LogicaFacade implements ILogicaFacade {
             cliente = new Cliente(new Date(), 1, NombreReceptor,
                     RFCReceptor, PaisEnum.MEX.number, sucursal,Integer.parseInt(RegimenFiscalReceptor),DomicilioFiscalReceptor);
             }else {
+            	
+            	//Entonces Pertenece a un comprobante33
             	cliente = new Cliente(new Date(), 1, NombreReceptor,
                         RFCReceptor, PaisEnum.MEX.number, sucursal,DomicilioFiscalReceptor);
                 
@@ -134,6 +147,30 @@ public class LogicaFacade implements ILogicaFacade {
                         diExc.getCause());
             }
         }
+        
+        //Actualizacion cuando ya existe un registro en la BD
+        else {
+    	   
+    	    //Se realiza una consulta para identificar al Cliente por su RFC y Id
+    	   new Cliente();
+    	   Cliente cliente = clienteService.getClienteByParams(RFCReceptor, sucursal.getId());
+         
+    	   //Obtenemos los datos a actualizas
+      	 if(comprobante40 != null) {
+      		 cliente = new Cliente(cliente.getId(), cliente.getTelefono1(), cliente.getTelefono2(),cliente.getFechaAlta(), 1,NombreReceptor,RFCReceptor,cliente.getPais(), sucursal,
+      				 Integer.parseInt(RegimenFiscalReceptor), DomicilioFiscalReceptor);
+               }
+      	 try {
+      		 //Insertamos los nuevos datos y se guardan en la BD
+               clienteService.save(cliente);
+           } catch (DataIntegrityViolationException diExc) {
+        	   
+               LOG.error("Error al momento de guardar al cliente en la base de datos", diExc);
+               throw new Exception("Error al momento de guardar al cliente en la base de datos",
+                       diExc.getCause());
+           }
+    	   
+       }
 
         return true;
     }

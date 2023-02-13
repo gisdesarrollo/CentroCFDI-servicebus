@@ -62,8 +62,8 @@ public class Cliente implements Serializable {
     private Sucursal sucursal;
 
     public Cliente(){}
-
-    public Cliente(Date fechaAlta, int status, String razonSocial, String rfc, int pais, Sucursal sucursal,int regimenFiscal,String codigoPostal) {
+  
+    public Cliente(Date fechaAlta,int status, String razonSocial, String rfc, int pais, Sucursal sucursal,int regimenFiscal,String codigoPostal) {
         this.fechaAlta = fechaAlta;
         this.status = status;
         this.razonSocial = razonSocial;
@@ -83,6 +83,28 @@ public class Cliente implements Serializable {
         this.sucursal = sucursal;
         this.codigoPostal = codigoPostal;
         
+    }
+    
+    public Cliente(Long Id, String telefono1, String telefono2, Date fechaAlta,int status, String razonSocial,String rfc, int pais, Sucursal sucursal, int regimenFiscal, String codigoPostal) {
+    	this.id = Id;
+    	this.telefono1 = telefono1;
+    	this.telefono2 = telefono2;
+    	this.fechaAlta = fechaAlta;
+    	this.status = status;
+    	this.razonSocial = razonSocial;
+    	this.rfc = rfc;
+        this.pais = pais;
+        this.sucursal = sucursal;
+        this.regimenFiscal = regimenFiscal;
+        this.codigoPostal = codigoPostal;
+        
+    }
+    
+    
+    
+    public Cliente(Long Id) {
+    	this.id = Id;
+    
     }
 
     public Long getId() {
