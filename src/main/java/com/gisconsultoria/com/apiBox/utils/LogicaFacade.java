@@ -152,24 +152,27 @@ public class LogicaFacade implements ILogicaFacade {
         else {
     	   
     	    //Se realiza una consulta para identificar al Cliente por su RFC y Id
-    	 
-    	   Cliente cliente = clienteService.getClienteByParams(RFCReceptor, sucursal.getId());
-         
-    	   //Obtenemos los datos a actualizas
-      	 if(comprobante40 != null) {
-      		 cliente = new Cliente(cliente.getId(), cliente.getTelefono1(), cliente.getTelefono2(),cliente.getFechaAlta(), 1,NombreReceptor,RFCReceptor,cliente.getPais(), sucursal,
-      				 Integer.parseInt(RegimenFiscalReceptor), DomicilioFiscalReceptor);
-               }
-      	 try {
-      		 
-      		 //Insertamos los nuevos datos y se guardan en la BD
-               clienteService.save(cliente);
-           } catch (DataIntegrityViolationException diExc) {
-        	   
-               LOG.error("Error al momento de guardar al cliente en la base de datos", diExc);
-               throw new Exception("Error al momento de guardar al cliente en la base de datos",
-                       diExc.getCause());
-           }
+			if (comprobante40 != null) {
+				Cliente cliente = clienteService.getClienteByParams(RFCReceptor, sucursal.getId());
+
+				// Obtenemos los datos a actualizas
+
+				cliente = new Cliente(cliente.getId(), cliente.getTelefono1(), cliente.getTelefono2(),
+						cliente.getFechaAlta(), 1, NombreReceptor, cliente.getRfc(), cliente.getPais(), sucursal,
+						Integer.parseInt(RegimenFiscalReceptor), DomicilioFiscalReceptor);
+
+				try {
+
+					// Insertamos los nuevos datos y se guardan en la BD
+					clienteService.save(cliente);
+					LOG.info("cliente actualizado correctamente con RFC: " + cliente.getRfc());
+				} catch (DataIntegrityViolationException diExc) {
+
+					LOG.error("Error al momento de ACTUALIZAR cliente en la base de datos", diExc);
+					throw new Exception("Error al momento de ACTUALIZAR al cliente en la base de datos",
+							diExc.getCause());
+				}
+			}
     	   
        }
 
