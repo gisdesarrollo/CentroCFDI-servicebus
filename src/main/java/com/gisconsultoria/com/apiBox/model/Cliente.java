@@ -72,6 +72,7 @@ public class Cliente implements Serializable {
         this.sucursal = sucursal;
         this.regimenFiscal = regimenFiscal;
         this.codigoPostal = codigoPostal;
+        //
         
     }
     public Cliente(Date fechaAlta, int status, String razonSocial, String rfc, int pais, Sucursal sucursal,String codigoPostal) {

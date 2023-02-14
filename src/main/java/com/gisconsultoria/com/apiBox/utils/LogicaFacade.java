@@ -161,6 +161,7 @@ public class LogicaFacade implements ILogicaFacade {
       				 Integer.parseInt(RegimenFiscalReceptor), DomicilioFiscalReceptor);
                }
       	 try {
+      		 
       		 //Insertamos los nuevos datos y se guardan en la BD
                clienteService.save(cliente);
            } catch (DataIntegrityViolationException diExc) {
