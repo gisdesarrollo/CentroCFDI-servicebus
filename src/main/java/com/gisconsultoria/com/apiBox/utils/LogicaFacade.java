@@ -152,7 +152,7 @@ public class LogicaFacade implements ILogicaFacade {
         else {
     	   
     	    //Se realiza una consulta para identificar al Cliente por su RFC y Id
-    	   new Cliente();
+    	 
     	   Cliente cliente = clienteService.getClienteByParams(RFCReceptor, sucursal.getId());
          
     	   //Obtenemos los datos a actualizas
